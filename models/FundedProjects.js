@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const fpSchema = Schema({
     title: String,
-	year:Date,
+	year:Number,
 	agency: String,
 	name: String,
 	GoP: String,

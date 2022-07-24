@@ -831,6 +831,20 @@ router.get('/getEvents',(req,res) =>{
         }
     })
 })
+
+router.get('/getFP',(req,res) =>{
+    res.header("Access-Control-Allow-Origin", "*");
+    addFP.find({}).then(data =>{
+        if(data.length)
+        {
+            res.json({
+                message: "Found",
+                length: data.length,
+                data
+            })
+        }
+    })
+})
    
 
 module.exports = router
