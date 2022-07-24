@@ -273,7 +273,44 @@ router.post('/assignmember', (req,res) =>{
             })
         })
     })
-           
+
+    router.post('/remove', (req,res) =>{
+        res.header("Access-Control-Allow-Origin", "*");
+    
+        let {name,branch} = req.body
+        User.find(req.body).then(result =>{
+            if(!result.length)
+            {
+                res.json({
+                    "status": "FAILED",
+                    "message": "Couldn't find the user"
+                })
+            }else{
+                User.findOneAndUpdate(req.body,
+                    {
+                        "type": "F"
+                    
+                }).then(resulting =>{
+                    
+                        
+                            res.json({
+                                "status": "SUCCESS",
+                
+                                "message": "Sucessfully removed "+resulting.name+" as member",
+                                "data": resulting
+                            })
+                        })
+            }
+        })
+        .catch(err =>{
+                res.json({
+                    "status": "FAILED",
+                    "message": "An error occured",
+                })
+            })
+        })
+                   
+
     
 router.get('/getFaculties',(req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
@@ -281,6 +318,26 @@ router.get('/getFaculties',(req,res) =>{
         type: "F"
     }).then(data =>{
         console.log("Faculties = ",data)
+        if(data.length){
+            res.json({
+                status: "SUCCESS",
+                data
+            })
+        }
+        else{
+            res.json({
+                status: "FAILED"
+            })
+        }
+    })
+})    
+
+router.get('/getMember',(req,res) =>{
+    res.header("Access-Control-Allow-Origin", "*");
+    User.find({
+        type: "M"
+    }).then(data =>{
+        console.log("Members = ",data)
         if(data.length){
             res.json({
                 status: "SUCCESS",
