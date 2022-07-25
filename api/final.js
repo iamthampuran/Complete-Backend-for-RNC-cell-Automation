@@ -690,15 +690,7 @@ router.get('/return', (req,res) =>{
         num1.findOneAndUpdate(change,{num: ++c}).then(incremental =>{
             console.log("C updated", c)
         })
-    })  
-
-    /*num1.findOne({}).then(inc1 =>{
-        console.log("Data in db ",inc1)
-    })*/
-
-
-
-    Reimbursment.find({})
+        Reimbursment.find({})
     .then(data =>{
         var reimbursed
         //console.log(data)
@@ -733,12 +725,21 @@ router.get('/return', (req,res) =>{
             name: v.name,
             year: y
         })
-        
+        console.log("Response:",res.count)
     })
     //console.log("The response is:",res)
    
 
 })
+    })  
+
+    /*num1.findOne({}).then(inc1 =>{
+        console.log("Data in db ",inc1)
+    })*/
+
+
+
+    
 
 
 
