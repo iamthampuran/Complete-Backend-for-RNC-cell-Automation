@@ -7,7 +7,8 @@ const addESchema = new Schema({
 	venue:String, 
 	org: String, 
 	date: String,
-    time: String, 
+    time: String,
+	source: String
 })
 
 const addEvnt = mongoose.model('Event',addESchema)

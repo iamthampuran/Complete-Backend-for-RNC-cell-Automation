@@ -679,6 +679,9 @@ router.get('/return', (req,res) =>{
     res.header("Access-Control-Allow-Origin","*");
     var c 
     var ident
+    const d3 = new Date()
+    var x = d3.getFullYear()
+
     num1.find({}).then(result =>{
         console.log("C value: ",result)
         c = result[0].num
@@ -686,6 +689,13 @@ router.get('/return', (req,res) =>{
         ident = result[0].id
         change = {num: c}
         console.log("Change = ",change)
+
+        if(x!=result[0].year)
+        {
+            num1.findOneAndUpdate(change,{num:0,year: x}).then(update =>{
+                console.log("Year Updated",year)
+            })
+        }
     
         num1.findOneAndUpdate(change,{num: ++c}).then(incremental =>{
             console.log("C updated", c)
