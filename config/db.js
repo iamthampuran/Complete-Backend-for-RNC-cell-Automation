@@ -1,7 +1,8 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
+//require('./../.env')
 
-mongoose.connect(process.env.MONGODB_URI,{
+mongoose.connect("mongodb+srv://Amogh:ASTDB@cluster0.myclosi.mongodb.net/?retryWrites=true&w=majority",{
     useNewUrlParser: true, 
     useUnifiedTopology:true,
 })
