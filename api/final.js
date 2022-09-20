@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 //mongodb user model
 const User = require('../models/Login')
-const bcrypt = require('bcrypt') //password hashing
+//const bcrypt = require('bcrypt') //password hashing
 const PermPublication = require('./../models/PemPublication')
 const publication = require('../models/Publications')
 const RemovedPublication = require('./../models/RemovedPublications')
@@ -13,6 +13,7 @@ const addFP = require('./../models/FundedProjects')
 //const addEvnt = require('./../api/Events')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = "SIGNIN_API"
+const bcrypt = require('bcryptjs')
 
 
 
