@@ -199,6 +199,8 @@ router.post('/viewprofile', (req,res) =>{
                 "Faculties": {$regex : name}
             }).then(data =>{
                 RemovedPublication.find({Faculties: {$regex: name}}).then(removed =>{
+                    console.log(removed.length)
+                    console.log(removed)
                     if(removed.length)
                 {
                     res.json({
