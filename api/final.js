@@ -180,7 +180,7 @@ router.post('/signin', (req,res) =>{
     }
 })
 
-router.post('/viewprofile', (req,res) =>{
+router.post('/viewprofileapp', (req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
     let {name,branch} = req.body
     console.log("View Profile Request",req.body)
@@ -213,6 +213,7 @@ router.post('/viewprofile', (req,res) =>{
                     removed
                 })
             }
+                
             else{
                 res.json(({
                     "status": "SUCCESS",
@@ -240,6 +241,51 @@ router.post('/viewprofile', (req,res) =>{
     })
 })
 
+
+router.post('/viewprofilereject', (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    let { name, branch } = req.body
+    console.log("View Profile Request", req.body)
+    User.find(req.body).then(result => {
+        if (result.length) {
+            let name = result[0].name
+            let email = result[0].email
+            let branch = result[0].branch
+            console.log("Name = ", name, "\nEmail = ", email, '\nBranch = ', branch)
+            const requ = {
+                "Faculties": { $regex: name }
+            }
+            console.log(requ)
+            RemovedPublication.find({ Faculties: { $regex: name } }).then(removed => {
+                console.log(removed.length)
+                console.log(removed)
+                if (removed.length) {
+                    res.json({
+                        "status": "SUCCESS",
+                        "message": "Faculty details found",
+                        "name": name,
+                        "email": email,
+                        "branch": branch,
+                        data,
+                        removed
+                    })
+                }
+                else {
+                    res.json({
+                        "status": "FAILED",
+                        "message": "Faculty details not found"
+                    })
+                }
+            })
+        }
+        else {
+            res.json({
+                "status": "FAILED",
+                "message": "Faculty details not found"
+            })
+        }
+    })
+})
 
 router.post('/assignmember', (req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
