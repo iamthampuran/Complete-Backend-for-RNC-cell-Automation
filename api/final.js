@@ -266,7 +266,6 @@ router.post('/viewprofilereject', (req, res) => {
                         "name": name,
                         "email": email,
                         "branch": branch,
-                        data,
                         removed
                     })
                 }
