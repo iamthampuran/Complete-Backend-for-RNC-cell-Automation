@@ -698,7 +698,7 @@ router.post('/reimbursment', (req,res) =>{
     }).then(result =>{
       console.log("Updated C value: ",result)
     })*/
-    let {studentnames,name,year,totalfee,from,type} = req.body
+    let {studentnames,name,year,totalfee,from,type,institute} = req.body
     console.log("The requested body",req.body)
     studentnames = studentnames.trim()
     name = name.trim()
@@ -706,13 +706,15 @@ router.post('/reimbursment', (req,res) =>{
     totalfee = totalfee
     from = from.trim()
     type = type.trim()
+    institute = institute.trim()
     const newReimbursement = new Reimbursment({
         studentnames,
         name,
         year,
         totalfee,
         from,
-        type
+        type,
+        institute
     });
     newReimbursement.save().then(result =>{
         console.log("Result",result)
@@ -774,7 +776,7 @@ router.get('/return', (req,res) =>{
         const d = new Date()
         y = d.getFullYear()
         console.log(y)
-        const str = "Received with thanks, the amount of Rs"+reimbursed+" towards attending "+v.type+" at "+v.from+" from MITS R&C cell."; 
+        const str = "Received with thanks, the amount of Rs"+reimbursed+" towards attending "+v.type+" at "+v.institute+" from MITS R&C cell."; 
         console.log(str)
         res.json({
             message: "SUCCESS",

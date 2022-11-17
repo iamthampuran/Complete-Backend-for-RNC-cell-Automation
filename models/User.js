@@ -7,7 +7,8 @@ const FeeSchema = new Schema({
     year: Number,
     totalfee: Number,
     from:String,
-    type:String
+    type:String,
+    institute: String
 })
 
 const Reinbursement = mongoose.model('Fee Reinbursement',FeeSchema)
