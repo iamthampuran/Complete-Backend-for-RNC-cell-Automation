@@ -706,7 +706,7 @@ router.post('/reimbursment', (req,res) =>{
     totalfee = totalfee
     from = from.trim()
     type = type.trim()
-    institute = institute.trim()
+    institute = institute
     const newReimbursement = new Reimbursment({
         studentnames,
         name,
