@@ -707,22 +707,30 @@ router.post('/reimbursment', (req,res) =>{
     from = from.trim()
     type = type.trim()
     institute = institute
-    const newReimbursement = new Reimbursment({
-        studentnames,
-        name,
-        year,
-        totalfee,
-        from,
-        type,
-        institute
-    });
-    newReimbursement.save().then(result =>{
-        console.log("Result",result)
+    if(studentnames==""|| name == ""|| year == 0|| totalfee == 0|| from == "" || type == ""|| institute == "")
         res.json({
-            status: "SUCCESS",
-            message: "Fee Reimbursement Added"
+            status: "FAILED",
+            message: "Missing fields"
         })
-    })
+    else{
+        const newReimbursement = new Reimbursment({
+            studentnames,
+            name,
+            year,
+            totalfee,
+            from,
+            type,
+            institute
+        });
+        newReimbursement.save().then(result =>{
+            console.log("Result",result)
+            res.json({
+                status: "SUCCESS",
+                message: "Fee Reimbursement Added"
+            })
+        })
+    }
+    
 })
 
 router.get('/return', (req,res) =>{
