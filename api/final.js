@@ -21,16 +21,16 @@ const bcrypt = require('bcryptjs')
 
 router.post('/signup', (req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
-    let{name, branch, email, password, dateOfBirth} = req.body
+    let{name, branch, email, password, OCRid} = req.body
     console.log(req.body)
     console.log("Branch = ",req.body.branch,"\nEmail = ",req.body.email)
     name = name.trim()
     email = email.trim()
     password = password.trim()
-    dateOfBirth = dateOfBirth.trim()
+    OCRid = OCRid.trim()
     branch = branch.trim()
 
-    if(name == "" || email == "" || password == "" || dateOfBirth == "" || branch == "")
+    if(name == "" || email == "" || password == "" || OCRid == "" || branch == "")
     {
         res.json({
             status: "FAILED",
@@ -49,12 +49,12 @@ router.post('/signup', (req,res) =>{
             message: "Invalid email"
         }); 
     }
-    else if(!new Date(dateOfBirth).getTime()){
-        res.json({
-            status: "FAILED",
-            message: "Invalid Date"
-        });
-    }
+    // else if(!new Date(dateOfBirth).getTime()){
+    //     res.json({
+    //         status: "FAILED",
+    //         message: "Invalid Date"
+    //     });
+    // }
     else if(password.length<8){
         res.json({
             status: "FAILED",
@@ -82,7 +82,7 @@ router.post('/signup', (req,res) =>{
                         name,
                         email,
                         password: hashedPassword,
-                        dateOfBirth,
+                        OCRid   ,
                         branch,
                         type: "F"
                     });

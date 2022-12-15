@@ -5,7 +5,7 @@ const UserSchema = new Schema({
     name:String,
     email:String,
     password:String,
-    dateOfBirth:Date,
+    OCRid:String,
     type: String,
     branch: String
 })
