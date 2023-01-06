@@ -216,12 +216,8 @@ router.post('/viewprofileapp', (req,res) =>{
                 
             else{
                 res.json(({
-                    "status": "SUCCESS",
-                    "message": "Faculty details found",
-                    "name": name,
-                    "email": email,
-                    "branch": branch,
-                    data
+                    "status": "FAILED",
+                        "message": "Faculty details not found"
                 }))
             }
                 })
