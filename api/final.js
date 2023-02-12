@@ -14,7 +14,9 @@ const addFP = require('./../models/FundedProjects')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = "SIGNIN_API"
 const bcrypt = require('bcryptjs')
+const sgMail = require('@sendgrid/mail')
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 
 
@@ -549,7 +551,7 @@ router.get('/sort', (req,res) =>
 })
 
 
-router.get('/filter', (req,res) =>
+router.post('/filter', (req,res) =>
 {
    let {time} = req.body
    const d = new Date
@@ -559,8 +561,8 @@ router.get('/filter', (req,res) =>
    console.log("Curr Date = ",d)
    d.setFullYear(d.getFullYear() - time)
    console.log("New Date = ",d)
-   publication.find({
-    DateOfApproval: {$gt:d, $lt:y}
+   PermPublication.find({
+    Year: {$gt:d.getFullYear(), $lt:y.getFullYear()}
    }).then(data =>{
     if(data.length){
         res.json({
@@ -572,7 +574,7 @@ router.get('/filter', (req,res) =>
     else{
         res.json({
             status: "FAILED",
-            message: "Couldn't Filter"
+            message: "No matching results"
         }) 
     }
    })
@@ -968,5 +970,46 @@ router.get('/getFP',(req,res) =>{
     })
 })
    
+
+router.post('/forgot-password', (req, res) => {
+    // Find the user in the database by email
+    let mail = req.body
+    User.findOne( mail , (err, user) => {
+        console.log(req.body.email)
+        
+        if (err) {
+            res.status(500).send('Error finding user')
+        } else if (!user) {
+            res.status(404).send('User not found')
+        } else {
+            // Send the password to the user's email address
+            console.log(user)
+           const msg = {
+            to: req.body.email,
+            from: '19cs020@mgits.ac.in',
+            subject: 'Password reset',
+            text: 'Password of yours is: '+user.password,
+            
+           }
+           console.log(user.email)
+           console.log(user.password)
+           sgMail
+  .send(msg)
+  .then(() => {
+    console.log('Email sent')
+    res.json({
+        message: "Mail sent"
+    })
+  })
+  .catch((error) => {
+    console.error(error)
+  })
+        }
+    })
+})
+
+
+
+
 
 module.exports = router
