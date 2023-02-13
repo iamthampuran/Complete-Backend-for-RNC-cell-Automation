@@ -6,6 +6,7 @@ const FeeSchema = new Schema({
     name: String,
     year: Number,
     totalfee: Number,
+    reimbursed: Number,
     from:String,
     type:String,
     institute: String

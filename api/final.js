@@ -696,16 +696,18 @@ router.post('/reimbursment', (req,res) =>{
     }).then(result =>{
       console.log("Updated C value: ",result)
     })*/
-    let {studentnames,name,year,totalfee,from,type,institute} = req.body
+    let {studentnames,name,year,totalfee,reimbursed,from,type,institute,branch} = req.body
     console.log("The requested body",req.body)
     studentnames = studentnames.trim()
     name = name.trim()
     year = year
     totalfee = totalfee
+    reimbursed = reimbursed
     from = from.trim()
     type = type.trim()
+    branch = branch
     institute = institute
-    if(studentnames==""|| name == ""|| year == 0|| totalfee == 0|| from == "" || type == ""|| institute == "")
+    if(studentnames==""|| name == ""|| year == 0|| totalfee == 0|| from == "" || type == ""|| institute == "" || branch == "")
         res.json({
             status: "FAILED",
             message: "Missing fields"
@@ -716,9 +718,11 @@ router.post('/reimbursment', (req,res) =>{
             name,
             year,
             totalfee,
+            reimbursed,
             from,
             type,
-            institute
+            institute,
+            branch
         });
         newReimbursement.save().then(result =>{
             console.log("Result",result)
@@ -765,23 +769,11 @@ router.get('/return', (req,res) =>{
         v = data[x-1]
        // console.log(v)
         console.log("Data: ",data[x-1])
-        if(v.from == "NIT" || v.from == "IIT")
-        {
-            reimbursed = 0.75 * v.totalfee;
-        }
-        else if(v.from == "GOVT")
-        {
-            reimbursed = 0.5 * v.totalfee;
-        }
-        else if(v.from == "PVT")
-        {
-            reimbursed = 0.25 * v.totalfee;
-            if(reimbursed>2000)
-                reimbursed = 2000;
-        }
+        reimbursed = v.reimbursed
         const d = new Date()
         y = d.getFullYear()
         console.log(y)
+        console.log("Count = ",c)
         const str = "Received with thanks, the amount of Rs"+reimbursed+" towards attending "+v.type+" at "+v.institute+" from MITS R&C cell."; 
         console.log(str)
         res.json({
@@ -973,6 +965,7 @@ router.get('/getFP',(req,res) =>{
 
 router.post('/forgot-password', (req, res) => {
     // Find the user in the database by email
+    res.header("Access-Control-Allow-Origin", "*");
     let mail = req.body
     User.findOne( mail , (err, user) => {
         console.log(req.body.email)
