@@ -15,8 +15,9 @@ const jwt = require('jsonwebtoken')
 const SECRET_KEY = "SIGNIN_API"
 const bcrypt = require('bcryptjs')
 const sgMail = require('@sendgrid/mail')
+const nodemailer = require("nodemailer");
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+//sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 
 
@@ -403,21 +404,22 @@ router.get('/getMember',(req,res) =>{
 
 router.post('/add',(req,res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    let{Year,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch} = req.body
+    let{AcademicYear,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch} = req.body
     console.log(req.body)
     console.log('F =', Faculties)
     
-    Title = Title.trim()
-    Faculties = Faculties.trim()
-    Type = Type.trim()
-    SubType = SubType.trim()
-    Name = Name.trim()
-    Details = Details.trim()
-    ImpactFactor = ImpactFactor.trim()
-    Affiliated = Affiliated.trim()
-    Branch = Branch.trim()
+    Title = Title.
+    Faculties = Faculties.
+    Type = Type.
+    AcademicYear = AcademicYear
+    SubType = SubType
+    Name = Name
+    Details = Details
+    ImpactFactor = ImpactFactor
+    Affiliated = Affiliated
+    Branch = Branch
     //checking if the fields are empty
-    if(Year == "" ||Title == "" || Faculties == "" || Type == "" || SubType == "" || Name == "" || Details == "" || ImpactFactor == "" || Affiliated == "" || Branch == ""){
+    if(AcademicYear == "" ||Title == "" || Faculties == "" || Type == "" || SubType == "" || Name == "" || Details == "" || Affiliated == "" || Branch == ""){
         res.json({
             status: "FAILED",
             message: "Empty field"
@@ -435,7 +437,7 @@ router.post('/add',(req,res) => {
             }
             else{
                 const newPublication = new publication({
-                    Year,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch
+                    AcademicYear,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch
                 });
                 newPublication.save().then(result => {
                     res.json({
@@ -475,6 +477,7 @@ router.post('/retrieve', (req,res) =>{
         PermPublication.find(req.body)
         .then( data => {
             console.log(data)
+            
             if (data.length){
                 res.json({
                     status: "SUCCESS",
@@ -602,7 +605,7 @@ router.post('/verified', (req,res) =>{
             newdata = {
                 Faculties: data[0].Faculties,
                 Title: data[0].Title,
-                Year: data[0].Year,
+                AcademicYear: data[0].AcademicYear,
                 Type: data[0].Type,
                 SubType: data[0].SubType,
                 Name: data[0].Name,
@@ -645,7 +648,7 @@ router.post('/verified', (req,res) =>{
                 newdata = {
                     Faculties: data[0].Faculties,
                     Title: data[0].Title,
-                    Year: data[0].Year,
+                    AcademicYear: data[0].AcademicYear,
                     Type: data[0].Type,
                     SubType: data[0].SubType,
                     Name: data[0].Name,
@@ -948,9 +951,9 @@ router.get('/getEvents',(req,res) =>{
     })
 })
 
-router.get('/getFP',(req,res) =>{
+router.post('/getFP',(req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
-    addFP.find({}).then(data =>{
+    addFP.find(req.body).then(data =>{
         if(data.length)
         {
             res.json({
@@ -977,17 +980,24 @@ router.post('/forgot-password', (req, res) => {
         } else {
             // Send the password to the user's email address
             console.log(user)
-           const msg = {
-            to: req.body.email,
-            from: '19cs020@mgits.ac.in',
-            subject: 'Password reset',
-            text: 'Password of yours is: '+user.password,
+            let transporter = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 587,
+                secure: false,
+                auth: {
+                  user: "mitsrnc@mgits.ac.in", // generated ethereal user
+                  pass: "zxtmdbdqswkpsjcx", // generated ethereal password
+                },
+              });
             
-           }
-           console.log(user.email)
-           console.log(user.password)
-           sgMail
-  .send(msg)
+              // send mail with defined transport object
+              let info =transporter.sendMail({
+                from: "mitsrnc@mgits.ac.in", 
+                to: user.email, // list of receivers
+                subject: "Forgot Password ", // Subject line
+                text: "Hey "+user.name+" your password is: "+user.password   // plain text body
+                
+              })
   .then(() => {
     console.log('Email sent')
     res.json({

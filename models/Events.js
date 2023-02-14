@@ -3,12 +3,13 @@ const Schema = mongoose.Schema
 
 const addESchema = new Schema({
 
-    eventN: String,
-	venue:String, 
-	org: String, 
-	date: String,
-    time: String,
-	source: String
+    Event_Name: String,
+	Venue:String, 
+	Organisation: String, 
+	Date: String,
+    Time: String,
+	Source: String,
+	Branch: String
 })
 
 const addEvnt = mongoose.model('Event',addESchema)

@@ -2,12 +2,13 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const fpSchema = Schema({
     title: String,
-	year:Number,
+	AcademicYear:String,
 	agency: String,
 	name: String,
 	GoP: String,
     amount: Number, 
-	dept:String
+	dept:String,
+	status: String
 });
 
 const FundedProjects = mongoose.model('Funded Project',fpSchema)

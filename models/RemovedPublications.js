@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const RemovedPublicationSchema = new Schema({
-    Year: Number,
+    AcademicYear: String,
     Title: String,
     Faculties: String,
     Type: String,
