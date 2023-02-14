@@ -10,6 +10,7 @@ const Reimbursment = require('./../models/User')
 const num1 = require('./../models/inc')
 const addEvnt = require('./../models/Events')
 const addFP = require('./../models/FundedProjects')
+const mailsender = require('./../models/mailsender')
 //const addEvnt = require('./../api/Events')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = "SIGNIN_API"
@@ -969,6 +970,13 @@ router.post('/getFP',(req,res) =>{
 router.post('/forgot-password', (req, res) => {
     // Find the user in the database by email
     res.header("Access-Control-Allow-Origin", "*");
+    var mailer,password
+    mailsender.findOne({}).then(data =>{
+        // console.log(data.email,data.password)
+         mailer = data.email
+         password = data.password
+    })
+    console.log(mailer,password)
     let mail = req.body
     User.findOne( mail , (err, user) => {
         console.log(req.body.email)
@@ -985,8 +993,8 @@ router.post('/forgot-password', (req, res) => {
                 port: 587,
                 secure: false,
                 auth: {
-                  user: "mitsrnc@mgits.ac.in", // generated ethereal user
-                  pass: "zxtmdbdqswkpsjcx", // generated ethereal password
+                  user: mailer, // generated ethereal user
+                  pass: password, // generated ethereal password
                 },
               });
             
