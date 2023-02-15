@@ -1,0 +1,19 @@
+router.get('/check',(req,res)=>{
+    // Sample array of objects
+const users = [
+    { name: "Alice", email: "alice@example.com", OCRid: "123", password: "password1" },
+    { name: "Bob", email: "bob@example.com", OCRid: "456", password: "password2" },
+    { name: "Charlie", email: "charlie@example.com", OCRid: "789", password: "password3" }
+  ];
+  
+  // Use map() to transform the array of objects
+  const transformedUsers = users.map(user => ({ name: user.name, email: user.email }));
+  
+  // Log the transformed array
+  console.log(transformedUsers);
+  res.json({
+    data: transformedUsers,
+    message: "SUCCESS"
+  })
+  
+})

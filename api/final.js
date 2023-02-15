@@ -793,14 +793,19 @@ router.get('/getAll',(req,res)=>{
     Reimbursment.find({}).then(data =>{
         if(data.length)
         {
+            // console.log(data)
+            const usefuldetails = data.map(detail =>({Student_Names: detail.studentnames,name: detail.name,Fee_Reimbursed: detail.reimbursed,Year: detail.year}))
+             console.log(usefuldetails)
             res.json({
                 message: "Found",
                 length: data.length,
-                data
+                usefuldetails
             })
         }
     })
 })
+
+
 
 
 /*router.post("/", async (req, res) => {
@@ -987,7 +992,7 @@ router.post('/forgot-password', (req, res) => {
                 from: "RNC Admin", 
                 to: user.email, // list of receivers
                 subject: "Forgot Password ", // Subject line
-                text: "Hey "+user.name+" your password is: "+user.password   // plain text body
+                text: `Hey ${user.name}\nYour password is: ${user.password}`  // plain text body
                 
               })
   .then(() => {
