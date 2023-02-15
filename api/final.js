@@ -80,12 +80,11 @@ router.post('/signup', (req,res) =>{
 
 
                 //password handling
-                const saltRounds = 10;
-                bcrypt.hash(password,saltRounds).then(hashedPassword =>{
+
                     const newUser = new User({
                         name,
                         email,
-                        password: hashedPassword,
+                        password: password,
                         OCRid   ,
                         branch,
                         type: "F"
@@ -103,14 +102,8 @@ router.post('/signup', (req,res) =>{
                             message: "An error occured while signing you up"
                         });
                     })
-                })
-                .catch(err =>{
-                    res.json({
-                        status: "FAILED",
-                        message: "Error occured while hashing the password"
-                    });
-                })
-            }
+                }
+               
         }).catch(err => {
             console.log(err)
             res.json({
@@ -137,13 +130,11 @@ router.post('/signin', (req,res) =>{
         User.find({email})
         .then( data => {
             if (data.length){
-                const hashedPassword = data[0].password;
                 const token = jwt.sign({
                     email: data[0].email,
                     id: data[0]._id
                 }, SECRET_KEY)
-                bcrypt.compare(password, hashedPassword).then(result =>{
-                    if(result){
+                    if(password == data[0].password){
                         res.json({
                             status: "SUCCESS",
                             message: "Signin Successful",
@@ -158,15 +149,8 @@ router.post('/signin', (req,res) =>{
                             message: "Invalid password!"
                         })
                     }
-                })
-                .catch(err =>{
-                    console.log(err)
-                    res.json({
-                        status: "FAILED",
-                        message: "An error occured while comparing passwords"
-                    })
-                    
-                })
+            
+            
             }
             else{
                 res.json({
