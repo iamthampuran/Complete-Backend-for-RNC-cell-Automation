@@ -984,7 +984,7 @@ router.post('/forgot-password', (req, res) => {
             
               // send mail with defined transport object
               let info =transporter.sendMail({
-                from: "mitsrnc@mgits.ac.in", 
+                from: "RNC Admin", 
                 to: user.email, // list of receivers
                 subject: "Forgot Password ", // Subject line
                 text: "Hey "+user.name+" your password is: "+user.password   // plain text body
