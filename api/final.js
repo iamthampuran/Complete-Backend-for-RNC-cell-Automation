@@ -171,6 +171,7 @@ router.post('/signin', (req,res) =>{
 router.post('/viewprofileapp', (req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
     let {name,branch} = req.body
+   // console.log(req.body)
     console.log("View Profile Request",req.body)
     User.find(req.body).then(result =>{
         if(result.length){
@@ -186,10 +187,10 @@ router.post('/viewprofileapp', (req,res) =>{
             PermPublication.find({
                 "Faculties": {$regex : name}
             }).then(data =>{
-                RemovedPublication.find({Faculties: {$regex: name}}).then(removed =>{
-                    console.log(removed.length)
-                    console.log(removed)
-                    if(removed.length)
+                PermPublication.find({Faculties: {$regex: name}}).then(approved =>{
+                    console.log(approved.length)
+                    console.log(approved)
+                    if(approved.length)
                 {
                     res.json({
                     "status": "SUCCESS",
@@ -197,8 +198,7 @@ router.post('/viewprofileapp', (req,res) =>{
                     "name": name,
                     "email": email,
                     "branch": branch,
-                    data,
-                    removed
+                    approved
                 })
             }
                 
@@ -577,7 +577,13 @@ router.post('/filter', (req,res) =>
 
 router.post('/verified', (req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
-    console.log(req.body)
+    // console.log(req.body)
+    var mailer,password
+    mailsender.findOne({}).then(data =>{
+        // console.log(data.email,data.password)
+         mailer = data.email
+         password = data.password
+    })
     let {Title,Confirm} = req.body
     console.log(Title)
     Title = Title.trim()
@@ -585,8 +591,8 @@ router.post('/verified', (req,res) =>{
         publication.find({Title})
     .then(data =>{
         if(data.length){
-            console.log(data)
-            console.log(data[0].Faculties)
+            // console.log(data)
+            // console.log(data[0].Faculties)
             newdata = {
                 Faculties: data[0].Faculties,
                 Title: data[0].Title,
@@ -613,7 +619,26 @@ router.post('/verified', (req,res) =>{
                     {
                         console.log("File\n:",data1)
                     })
-                console.log(publication.find())
+                // console.log(publication.find())
+                let transporter = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false,
+                    auth: {
+                      user: mailer, // generated ethereal user
+                      pass: password, // generated ethereal password
+                    },
+                  });
+                
+                  // send mail with defined transport object
+                  let info =transporter.sendMail({
+                    from: "RNC Admin", 
+                    to: mailer, // list of receivers
+                    subject: "Publication Approval Accepted ", // Subject line
+                    text: `Hey RNC Admin, a publication approval of name ${Title} was accepted!!`  // plain text body
+                    
+                  })
+                
             })
             
         }
