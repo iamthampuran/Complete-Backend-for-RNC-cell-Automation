@@ -387,24 +387,29 @@ router.get('/getMember',(req,res) =>{
 
 
 
-router.post('/add',(req,res) => {
+router.post('/add',(req,res) => { 
     res.header("Access-Control-Allow-Origin", "*");
-    let{AcademicYear,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch} = req.body
+    let{Year,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch} = req.body
     console.log(req.body)
     console.log('F =', Faculties)
-    
-    Title = Title.
-    Faculties = Faculties.
-    Type = Type.
-    AcademicYear = AcademicYear
-    SubType = SubType
-    Name = Name
-    Details = Details
-    ImpactFactor = ImpactFactor
-    Affiliated = Affiliated
-    Branch = Branch
+    let message1;
+    Title = Title.trim()
+    Faculties = Faculties.trim()
+    Type = Type.trim()
+    SubType = SubType.trim()
+    Name = Name.trim()
+    Details = Details.trim()
+    ImpactFactor = ImpactFactor.trim()
+    Affiliated = Affiliated.trim()
+    Branch = Branch.trim()
+    var mailer,password
+    mailsender.findOne({}).then(data =>{
+        // console.log(data.email,data.password)
+         mailer = data.email
+         password = data.password
+    })
     //checking if the fields are empty
-    if(AcademicYear == "" ||Title == "" || Faculties == "" || Type == "" || SubType == "" || Name == "" || Details == "" || Affiliated == "" || Branch == ""){
+    if(Year == "" ||Title == "" || Faculties == "" || Type == "" || SubType == "" || Name == "" || Details == "" || ImpactFactor == "" || Affiliated == "" || Branch == ""){
         res.json({
             status: "FAILED",
             message: "Empty field"
@@ -412,7 +417,7 @@ router.post('/add',(req,res) => {
     }
     else{
         //checking if publication exist
-        publication.find({Title}).then(result =>{
+        publication.find({Title}).then(result =>{    
             if(result.length)
             {
                 res.json({
@@ -422,18 +427,74 @@ router.post('/add',(req,res) => {
             }
             else{
                 const newPublication = new publication({
-                    AcademicYear,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch
+                    Year,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch
                 });
                 newPublication.save().then(result => {
-                    res.json({
-                        status: "SUCCESS",
-                        message: "Publication Approval Requested!",
-                        data: result,
-                        //newdata: newPublication
-                    });
+                   
+           //console.log(user)
+           
+           User.findOne({
+            type: "M",branch:"CSE"
+        }).then(data1 =>{
+            
+            console.log("Members = ",data1)
+            if(data1){
+                console.log(data1.email)
+
+                let transporter = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false,
+                    auth: {
+                      user: mailer, // generated ethereal user
+                      pass: password, // generated ethereal password
+                    },
+                  });
+                
+                  // send mail with defined transport object
+                  let info =transporter.sendMail({
+                    from: "RNCAdmin", 
+                    to: data1.email, // list of receivers
+                    subject: "Received approval request ", // Subject line
+                    text: `Hey ${data1.name},\n\n A Publication Approval was Requested\n\n\n Regards,\n RNC Admin,MITS`  // plain text body
+                    
+                  })
+      .then(() => {
+        console.log('Email sent')
+        res.json({
+            status: "SUCCESS",
+            message: "Publication Approval Requested!\nmail sent",
+            data: result,
+            //newdata: newPublication
+        })
+        })
+                
+            }
+            else{
+                res.json({
+                    status: "FAILED"
                 })
             }
         })
+
+       
+  .catch((error) => {
+    console.error("mail errrr"+error)
+    res.json({
+        status: "SUCCESS",
+        message: "Publication Approval Requested!\nnot  mail sent ",
+        data: result,
+        //newdata: newPublication
+    })
+  })
+
+//   res.json({
+//     status: "SUCCESS",
+//     message: "Publication Approval Requested!\n",
+//     data: result,
+//     //newdata: newPublication
+// })
+             
         
         .catch(err => {
             console.log(err)
@@ -442,9 +503,11 @@ router.post('/add',(req,res) => {
                 message: "Error occured while uploading"
             });
         }) 
-    }
+    } )
     
-})
+}
+})}})
+
 
 router.post('/retrieve', (req,res) =>{
     //let{Title} = req.body
@@ -577,13 +640,14 @@ router.post('/filter', (req,res) =>
 
 router.post('/verified', (req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
-    // console.log(req.body)
     var mailer,password
     mailsender.findOne({}).then(data =>{
         // console.log(data.email,data.password)
          mailer = data.email
          password = data.password
     })
+    console.log(mailer,password)
+    console.log(req.body)
     let {Title,Confirm} = req.body
     console.log(Title)
     Title = Title.trim()
@@ -591,8 +655,8 @@ router.post('/verified', (req,res) =>{
         publication.find({Title})
     .then(data =>{
         if(data.length){
-            // console.log(data)
-            // console.log(data[0].Faculties)
+            console.log(data)
+            console.log(data[0].Faculties)
             newdata = {
                 Faculties: data[0].Faculties,
                 Title: data[0].Title,
@@ -619,26 +683,33 @@ router.post('/verified', (req,res) =>{
                     {
                         console.log("File\n:",data1)
                     })
-                // console.log(publication.find())
-                let transporter = nodemailer.createTransport({
-                    host: 'smtp.gmail.com',
-                    port: 587,
-                    secure: false,
-                    auth: {
-                      user: mailer, // generated ethereal user
-                      pass: password, // generated ethereal password
-                    },
-                  });
-                
-                  // send mail with defined transport object
-                  let info =transporter.sendMail({
-                    from: "RNC Admin", 
-                    to: mailer, // list of receivers
-                    subject: "Publication Approval Accepted ", // Subject line
-                    text: `Hey RNC Admin, a publication approval of name ${Title} was accepted!!`  // plain text body
+                    let transporter = nodemailer.createTransport({
+                        host: 'smtp.gmail.com',
+                        port: 587,
+                        secure: false,
+                        auth: {
+                          user: mailer, // generated ethereal user
+                          pass: password, // generated ethereal password
+                        },
+                      });
                     
-                  })
-                
+                      // send mail with defined transport object
+                      let info =transporter.sendMail({
+                        from: "RNC Admin", 
+                        to: mailer, // list of receivers
+                        subject: "Publication Accepted ", // Subject line
+                        text: `Hey a publication approval was accepted`  // plain text body
+                        
+                      })
+          .then(() => {
+            console.log('Email sent')
+        
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+                // console.log(publication.find())
+                console.log(mailer,password)
             })
             
         }
@@ -819,7 +890,7 @@ router.get('/getAll',(req,res)=>{
         if(data.length)
         {
             // console.log(data)
-            const usefuldetails = data.map(detail =>({Student_Names: detail.studentnames,name: detail.name,Fee_Reimbursed: detail.reimbursed,Year: detail.year}))
+            const usefuldetails = data.map(detail =>({Student_Names: detail.studentnames,name: detail.name,Fee_Reimbursed: detail.reimbursed,Year: detail.year,Amount_Spent: detail.totalfee}))
              console.log(usefuldetails)
             res.json({
                 message: "Found",
@@ -827,37 +898,15 @@ router.get('/getAll',(req,res)=>{
                 usefuldetails
             })
         }
+        else
+        {
+            res.json({
+                "message": "Fail"
+            })
+        }
     })
 })
 
-
-
-
-/*router.post("/", async (req, res) => {
-
-    //console.log(req.body)
-	try {
-        
-	 	// const { error } = validate(req.body);
-        //  //console.log('validatiom')
-	 	// if (error)
-	 	// return res.status(400).send({ message: error.details[0].message });
-        //  console.log(error.details[0].message)
-        
-        const adttl = await addEvnt.findOne({ eventN: req.body.eventN});
-		if (adttl)
-		    console.log(req.body)
-			return res
-				.status(200)
-				.send({ data : req.body,message: "Same event "+req.body.eventN+" details already Exist in db!" });
-				
-        await new addEvnt(req.body).save();
-		res.status(201).send({ message: "Event of "+req.body.eventN+"'s details created successfully" });
-	} catch (error) {
-        console.log(error)
-		res.status(500).send({ message: "Internal Server Error" });
-	}
-});*/
 
 
 router.post("/AddEvent", async (req, res) => {
@@ -865,12 +914,6 @@ router.post("/AddEvent", async (req, res) => {
     console.log(req.body)
     console.log(res.header)
 	try {
-        
-	 	// const { error } = validate(req.body);
-        //  //console.log('validatiom')
-	 	// if (error)
-	 	// return res.status(400).send({ message: error.details[0].message });
-        //  console.log(error.details[0].message)
         
         addEvnt.find(req.body).then(adttl =>{
             if (adttl.length)
@@ -883,7 +926,7 @@ router.post("/AddEvent", async (req, res) => {
             else{
                 new addEvnt(req.body).save().then(data=>{
                     res.json
-                ({ message: "Event of "+req.body.eventN+"'s details created successfully",
+                ({ message: "Event of "+req.body.Event_Name+"'s details created successfully",
                 data });
                 });
             }     
@@ -957,10 +1000,12 @@ router.get('/getEvents',(req,res) =>{
     addEvnt.find({}).then(data =>{
         if(data.length)
         {
+            const usefuldetails = data.map(detail=>({Venue: detail.Venue,Event_Name: detail.Event_Name,Oraganisation: detail.Organisation,Date: detail.Date,Time: detail.Time,Branch: detail.Branch,Source: detail.Source}))
+                    console.log(usefuldetails)
             res.json({
                 message: "Found",
                 length: data.length,
-                data
+                usefuldetails
             })
         }
     })
@@ -971,6 +1016,7 @@ router.post('/getFP',(req,res) =>{
     addFP.find(req.body).then(data =>{
         if(data.length)
         {
+            console.log(data)
             res.json({
                 message: "Found",
                 length: data.length,

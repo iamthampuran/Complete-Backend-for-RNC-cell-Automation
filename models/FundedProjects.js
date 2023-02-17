@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const fpSchema = Schema({
@@ -8,7 +9,8 @@ const fpSchema = Schema({
 	GoP: String,
     amount: Number, 
 	dept:String,
-	status: String
+	status: String,
+	type: String
 });
 
 const FundedProjects = mongoose.model('Funded Project',fpSchema)
