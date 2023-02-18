@@ -389,10 +389,9 @@ router.get('/getMember',(req,res) =>{
 
 router.post('/add',(req,res) => { 
     res.header("Access-Control-Allow-Origin", "*");
-    let{Year,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch} = req.body
+    let{Year,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch,AcademicYear} = req.body
     console.log(req.body)
     console.log('F =', Faculties)
-    let message1;
     Title = Title.trim()
     Faculties = Faculties.trim()
     Type = Type.trim()
@@ -402,6 +401,7 @@ router.post('/add',(req,res) => {
     ImpactFactor = ImpactFactor.trim()
     Affiliated = Affiliated.trim()
     Branch = Branch.trim()
+    AcademicYear = AcademicYear.trim()
     var mailer,password
     mailsender.findOne({}).then(data =>{
         // console.log(data.email,data.password)
@@ -409,7 +409,7 @@ router.post('/add',(req,res) => {
          password = data.password
     })
     //checking if the fields are empty
-    if(Year == "" ||Title == "" || Faculties == "" || Type == "" || SubType == "" || Name == "" || Details == "" || ImpactFactor == "" || Affiliated == "" || Branch == ""){
+    if(AcademicYear == "" ||Title == "" || Faculties == "" || Type == "" || SubType == "" || Name == "" || Details == "" || ImpactFactor == "" || Affiliated == "" || Branch == ""){
         res.json({
             status: "FAILED",
             message: "Empty field"
@@ -422,12 +422,12 @@ router.post('/add',(req,res) => {
             {
                 res.json({
                     status: "FAILED",
-                    message: "Already exist!!!"
+                    message: `The title ${Title} Already exist!!!`
                 })
             }
             else{
                 const newPublication = new publication({
-                    Year,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch
+                    AcademicYear,Title,Faculties,Type,SubType,Name,Details,ImpactFactor,Affiliated,Branch
                 });
                 newPublication.save().then(result => {
                    
@@ -456,7 +456,7 @@ router.post('/add',(req,res) => {
                     from: "RNCAdmin", 
                     to: data1.email, // list of receivers
                     subject: "Received approval request ", // Subject line
-                    text: `Hey ${data1.name},\n\n A Publication Approval was Requested\n\n\n Regards,\n RNC Admin,MITS`  // plain text body
+                    text: `Hey ${data1.name}(RNC Member),\n\n A Publication Approval was Requested.\nTitle : ${Title}\n by Faculty : ${Faculties} of ${Branch} Department.\nPlease check the website to approve or reject it.\n\n\n Regards,\n RNC Admin,MITS`  // plain text body
                     
                   })
       .then(() => {
@@ -529,7 +529,7 @@ router.post('/retrieve', (req,res) =>{
             if (data.length){
                 res.json({
                     status: "SUCCESS",
-                    message: "Found!!",
+                    message: "Publication details Found!!",
                     data
                 })
                 console.log("Result: ",data)
@@ -537,7 +537,7 @@ router.post('/retrieve', (req,res) =>{
             else{
                 res.json({
                     status: "FAILED",
-                    message: "Not found"
+                    message: "Publication details not found"
                 })
             }
         })
@@ -640,13 +640,16 @@ router.post('/filter', (req,res) =>
 
 router.post('/verified', (req,res) =>{
     res.header("Access-Control-Allow-Origin", "*");
-    var mailer,password
+    var mailer,password,adminMail
+
     mailsender.findOne({}).then(data =>{
         // console.log(data.email,data.password)
          mailer = data.email
          password = data.password
+         adminMail =data.admin_Mail
+
     })
-    console.log(mailer,password)
+    console.log(mailer,password,adminMail)
     console.log(req.body)
     let {Title,Confirm} = req.body
     console.log(Title)
@@ -673,11 +676,7 @@ router.post('/verified', (req,res) =>{
             const newPermpublication = new PermPublication(newdata);
             console.log(newPermpublication)
             newPermpublication.save().then(result =>{   
-                res.json({
-                    status: "SUCCESS",
-                    message: "Publication added to permanent database",
-                    data: result
-                });
+                
                 console.log(Title)
                 publication.findOneAndDelete({"Title":data[0].Title}).then(data1 =>
                     {
@@ -694,16 +693,20 @@ router.post('/verified', (req,res) =>{
                       });
                     
                       // send mail with defined transport object
-                      let info =transporter.sendMail({
+                      transporter.sendMail({
                         from: "RNC Admin", 
-                        to: mailer, // list of receivers
-                        subject: "Publication Accepted ", // Subject line
-                        text: `Hey a publication approval was accepted`  // plain text body
+                        to: adminMail, // list of receivers
+                        subject: "Publication Details Accepted ", // Subject line
+                        text: `Hey RNC Admin, \n\n Publication approval request is accepted by RNC Member.\n Title :${newdata.Title}\nby Faculty : ${newdata.Faculties} of ${newdata.Branch} Department.\n\n\n Regards,\n RNC Cell,MITS`  // plain text body
                         
                       })
           .then(() => {
-            console.log('Email sent')
-        
+            //console.log('Email sent')
+            res.json({
+                status: "SUCCESS",
+                message: "Publication added to permanent database\n Email sent to admin",
+                data: result
+            });
           })
           .catch((error) => {
             console.error(error)
@@ -814,7 +817,9 @@ router.post('/reimbursment', (req,res) =>{
                 status: "SUCCESS",
                 message: "Fee Reimbursement Added"
             })
-        })
+        }
+        
+        )
     }
         
 })
@@ -858,14 +863,15 @@ router.get('/return', (req,res) =>{
         y = d.getFullYear()
         console.log(y)
         console.log("Count = ",c)
-        const str = "Received with thanks, the amount of Rs"+reimbursed+" towards attending "+v.type+" at "+v.institute+" from MITS R&C cell."; 
+        const str = "Received with thanks, the amount of Rs "+reimbursed+"/- towards attending "+v.type+" at "+v.institute+" from MITS R&C cell."; 
         console.log(str)
         res.json({
             message: "SUCCESS",
             documentation: str,
             count: c,
             name: v.name,
-            year: y
+            year: y,
+            branch:v.branch
         })
         console.log("Response:",res.count)
     })
@@ -890,7 +896,7 @@ router.get('/getAll',(req,res)=>{
         if(data.length)
         {
             // console.log(data)
-            const usefuldetails = data.map(detail =>({Student_Names: detail.studentnames,name: detail.name,Fee_Reimbursed: detail.reimbursed,Year: detail.year,Amount_Spent: detail.totalfee}))
+            const usefuldetails = data.map(detail =>({Student_Names: detail.studentnames,Faculty_name: detail.name,Fee_Reimbursed: detail.reimbursed,Amount_Spent: detail.totalfee,Department: detail.branch,'Type of the program' : detail.type,Year: detail.year,'Type of institute': detail.from,'Name of institute': detail.institute}))
              console.log(usefuldetails)
             res.json({
                 message: "Found",
@@ -979,7 +985,7 @@ router.post("/AddEvent", async (req, res) => {
 
 
 router.post("/addFP", async (req, res) => {
-    console.log(req.body.name)
+    console.log(req.body)
 	try {
         const adttl = await addFP.findOne({ title: req.body.title});
 		if (adttl)
@@ -1012,15 +1018,18 @@ router.get('/getEvents',(req,res) =>{
 })
 
 router.post('/getFP',(req,res) =>{
+    console.log(req.body)
     res.header("Access-Control-Allow-Origin", "*");
     addFP.find(req.body).then(data =>{
         if(data.length)
         {
+            const usefuldetails = data.map(detail=>({Title: detail.title,Academic_Year: detail.AcademicYear,Agency: detail.agency,Department: detail.dept,'Name & designation of PI/CO PI': detail.name,Branch: detail.Branch,sector: detail.GoP,Amount:detail.amount,Type: detail.type,status: detail.status}))
+                    console.log(usefuldetails)
             console.log(data)
             res.json({
                 message: "Found",
                 length: data.length,
-                data
+                usefuldetails
             })
         }
     })

@@ -9,7 +9,8 @@ const FeeSchema = new Schema({
     reimbursed: Number,
     from:String,
     type:String,
-    institute: String
+    institute: String,
+    branch: String
 })
 
 const Reinbursement = mongoose.model('Fee Reinbursement',FeeSchema)

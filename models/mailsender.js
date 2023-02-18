@@ -3,7 +3,9 @@ const Schema = mongoose.Schema
 
 const MailSchema = new Schema({
     email:String,
-    password:String,                                
+    password:String,  
+    admin_Mail:String
+                              
 })
 
 const Mail = mongoose.model('Mail', MailSchema)
